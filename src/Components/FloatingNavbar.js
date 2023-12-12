@@ -5,9 +5,13 @@ import { GenericAddForm  } from "../GenericComponents/GenericComponents";
 import { loginUsersEntityDefinition } from "../EntityDefinitions/User";
 import { useDispatch, useSelector } from "react-redux";
 import { userRoles, pages } from "../utils/enums";
+import ModalCart from "./ModalCart";
+import * as Icons from 'react-bootstrap-icons';
 export function FloatingNavbar()
 {
     const [show, setShow] = useState(false);
+    const [showModalCart,setShowModalCart]=useState(false);
+
     const dispatch = useDispatch();
     const user = useSelector(state => state.user);
 
@@ -24,11 +28,14 @@ export function FloatingNavbar()
     const navbarOptions = () => {
         if (user === null) {
             return (
+                <>
                 <Button variant="primary"
                         onClick={() => setShow(true)}
                         style={{marginRight: "20px",fontSize: "20px"}}>
                     Login
                 </Button>
+                </>
+
             );
         }
         if ( user && user.role == userRoles.NORMAL) {
@@ -43,6 +50,11 @@ export function FloatingNavbar()
                     My Bookings
                 </NavLink>
                 <Button variant="primary"
+                        onClick={() => setShowModalCart(true)}
+                        style={{marginRight: "20px",fontSize: "20px"}}>
+                            <Icons.Cart size={25}></Icons.Cart>
+                </Button>
+                <Button variant="primary"
                         onClick={() => logoutHandler()}
                         style={{marginRight: "20px",fontSize: "20px"}}
                 >Logout</Button>
@@ -56,6 +68,11 @@ export function FloatingNavbar()
                  style={{marginRight: "20px",fontSize: "20px"}}>
                     Parking Spots
                 </NavLink>
+                <Button variant="primary"
+                        onClick={() => setShowModalCart(true)}
+                        style={{marginRight: "20px",fontSize: "20px"}}>
+                             <Icons.Cart size={25}></Icons.Cart>
+                </Button>
                 <Button variant="primary"
                         onClick={() => logoutHandler()}
                         style={{marginRight: "20px",fontSize: "20px"}}
@@ -91,6 +108,10 @@ export function FloatingNavbar()
             submitButtonText="Login"
             show={show}
             handleClose={()=>setShow(false)}
+        />
+        <ModalCart
+            modalShow={showModalCart}
+            setModalShow={setShowModalCart}
         />
         </>
     );
