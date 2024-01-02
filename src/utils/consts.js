@@ -1,11 +1,28 @@
-import { pages } from "../utils/enums";
+import { pages, userRoles } from "../utils/enums";
 import Home from "../Pages/Home";
 import abi from './Transactions.json';
 
+function getPageBasedOnUserFromLocalStorage  ()  {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+        if (user.role === userRoles.NORMAL) {
+            return pages.PARKING;
+        }
+        else if (user.role === userRoles.PARKOWNER) {
+            return pages.MYPARKINGS;
+        }
+    }
+    return pages.HOME;
+}
+
 export const pagesDictionary = {
     "HOME": (options) => <Home/>,
+    "PARKING": (options) => <></>,
+    "BOOKING": (options) => <></>,
+    "MYPARKINGS": (options) => <></>,
 }
-export const initialStatePage = pagesDictionary[pages.HOME]();
+
+export const initialStatePage = pagesDictionary[getPageBasedOnUserFromLocalStorage()]();
 
 export const userInitialState = null
 

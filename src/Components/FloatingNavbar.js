@@ -2,7 +2,7 @@ import {Button, NavLink, Navbar} from "react-bootstrap";
 import logo from "../assets/logo.png";
 import { useState } from "react";
 import { GenericAddForm  } from "../GenericComponents/GenericComponents";
-import { loginUsersEntityDefinition } from "../EntityDefinitions/User";
+import { loginEntityDefinition, useLoginUser } from "../EntityDefinitions/Credentials";
 import { useDispatch, useSelector } from "react-redux";
 import { userRoles, pages } from "../utils/enums";
 import ModalCart from "./ModalCart";
@@ -12,6 +12,8 @@ export function FloatingNavbar()
     const [show, setShow] = useState(false);
     const [showModalCart,setShowModalCart]=useState(false);
 
+    const [loginEntityDefinition, loginUser] = useLoginUser();
+
     const dispatch = useDispatch();
     const user = useSelector(state => state.user);
 
@@ -20,12 +22,12 @@ export function FloatingNavbar()
     }
 
     const logoutHandler = () => {
-        dispatch({type: userRoles.NOUSER});
         dispatch({type: 'LOGOUT'});
         dispatch({type: pages.HOME});
     }
 
     const navbarOptions = () => {
+        console.log(user);
         if (user === null) {
             return (
                 <>
@@ -41,12 +43,12 @@ export function FloatingNavbar()
         if ( user && user.role == userRoles.NORMAL) {
             return (
                 <>
-                <NavLink href="/parking" 
-                style={{marginRight: "20px",fontSize: "20px"}}>
+                <NavLink onClick={() => pageDispatch(pages.PARKING)}
+                style={{marginRight: "20px",fontSize: "20px", fontWeight: "bold"}}>
                     Parking Spots
                 </NavLink>
-                <NavLink onClick={() => pageDispatch(pages.PARKING)}
-                    style={{marginRight: "20px",fontSize: "20px"}}>
+                <NavLink onClick={() => pageDispatch(pages.BOOKING)}
+                    style={{marginRight: "20px",fontSize: "20px", fontWeight: "bold"}}>
                     My Bookings
                 </NavLink>
                 <Button variant="primary"
@@ -65,14 +67,9 @@ export function FloatingNavbar()
             return (
                 <>
                 <NavLink onClick={() => pageDispatch(pages.PARKING)}
-                 style={{marginRight: "20px",fontSize: "20px"}}>
+                 style={{marginRight: "20px",fontSize: "20px", fontWeight: "bold"}}>
                     Parking Spots
                 </NavLink>
-                <Button variant="primary"
-                        onClick={() => setShowModalCart(true)}
-                        style={{marginRight: "20px",fontSize: "20px"}}>
-                             <Icons.Cart size={25}></Icons.Cart>
-                </Button>
                 <Button variant="primary"
                         onClick={() => logoutHandler()}
                         style={{marginRight: "20px",fontSize: "20px"}}
@@ -102,8 +99,8 @@ export function FloatingNavbar()
             </Navbar.Collapse>
         </Navbar>
         <GenericAddForm
-            data={loginUsersEntityDefinition.fields.map((field, idx)=>field.createAddData())}
-            onSubmit={loginUsersEntityDefinition.loginUser}
+            data={loginEntityDefinition.fields.map((field, idx)=>field.createAddData())}
+            onSubmit={loginUser}
             title="Login"
             submitButtonText="Login"
             show={show}

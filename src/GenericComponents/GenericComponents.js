@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
-import { BaseApi } from '../Api/BaseApi';
+import { BaseApi, enumMethods } from '../Api/BaseApi';
 
 /*
 //* form Form Component
@@ -135,6 +135,11 @@ export class Field {
         this.special = special;
         this.defaultValue = defaultValue;
         this.regex = this.constructRegex(regex);
+        this.value = defaultValue;
+    }
+
+    getValue = () => {
+        return this.defaultValue;
     }
 
     withRegex = (regex) => {
@@ -182,10 +187,10 @@ export class Field {
 export class EntityDefinition {
     // @param path string
     // @param fields Field[]
-    constructor(path, fields, entityName) {
-        this.path = path;
+    constructor(fields, entityName) {
         this.fields = fields;
         this.entityName = entityName;
+        this.entity = null;
     }
     getPath = () => {
         return this.path;
@@ -195,6 +200,9 @@ export class EntityDefinition {
     }
     getEntityName = () => {
         return this.entityName;
+    }
+    setEntity = (entity) => {
+        this.entity = entity;
     }
 }
 /*
@@ -211,25 +219,23 @@ export function GenericTabel({entityDefinition})
     const handleShowAdd = () => setShowAdd(true);
     const handleCloseAdd = () => setShowAdd(false);
 
-    const baseApi = new BaseApi();
-
     const getData =async ()=>{
-        const data = await baseApi.getAllApi(entityDefinition.getPath());
+        const data = await entityDefinition.getData();
         setData(data);
     }
 
     const updateData = async (data,id)=>{
-        const result = await baseApi.updateApi(entityDefinition.getPath(), id, data);
+        const result = entityDefinition.updateData(data,id);
         getData();
     }
 
     const deleteData =async (id)=>{
-        const result = await baseApi.deleteApi(entityDefinition.getPath(), id);
+        const result = await entityDefinition.deleteData(id);
         getData();
     }
 
     const addData = async (data)=>{
-        const result = await baseApi.insertApi(entityDefinition.getPath(), data);
+        const result = await entityDefinition.addData(data);
         getData();
     }
 

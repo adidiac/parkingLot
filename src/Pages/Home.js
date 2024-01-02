@@ -2,10 +2,8 @@ import { Button, Container,Row,Col } from 'react-bootstrap';
 import background1 from '../assets/background1.png';
 import background2 from '../assets/background2.png';
 import { GenericAddForm } from '../GenericComponents/GenericComponents';
-import {
-    registerNormalUserEntityDefinition,
-   registerParkOwnerUserEntityDefinition
-  } from '../EntityDefinitions/User';
+import {useRegisterParkingOwnerHook} from '../EntityDefinitions/ParkingOwner';
+import {useRegisterNormalUserHook} from '../EntityDefinitions/User';
 import { useState } from 'react';
 export default function Home() {
   const containerCenter = (leftOrRight)=>
@@ -37,6 +35,17 @@ export default function Home() {
   }
   const [showNormalUser, setShowNormalUser] = useState(false);
   const [showParkOwnerUser, setShowParkOwnerUser] = useState(false);
+
+  const [
+    registerParkOnwerEntity,
+    registerParkingOwner
+  ] = useRegisterParkingOwnerHook();
+
+  const  [
+    registerNormalUserEntity,
+    registerNormalUser
+  ] = useRegisterNormalUserHook();
+
     return (
         <div className="demo image above">
           <div id="user-screen" className="left">
@@ -79,16 +88,16 @@ export default function Home() {
           </Container>
           </div>
             <GenericAddForm
-                data={registerNormalUserEntityDefinition.getFields().map((field, idx)=>field.createAddData())}
-                onSubmit={registerNormalUserEntityDefinition.registerUser}
+                data={registerNormalUserEntity.getFields().map((field, idx)=>field.createAddData())}
+                onSubmit={registerNormalUser}
                 title="Register"
                 submitButtonText="Register"
                 show={showNormalUser}
                 handleClose={()=>setShowNormalUser(false)}
             />
             <GenericAddForm
-                data={registerParkOwnerUserEntityDefinition.getFields().map((field, idx)=>field.createAddData())}
-                onSubmit={registerParkOwnerUserEntityDefinition.registerUser}
+                data={registerParkOnwerEntity.getFields().map((field, idx)=>field.createAddData())}
+                onSubmit={registerParkingOwner}
                 title="Register"
                 submitButtonText="Register"
                 show={showParkOwnerUser}

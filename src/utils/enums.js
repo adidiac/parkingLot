@@ -7,4 +7,5 @@ export const pages = {
     HOME : 'HOME',
     PARKING : 'PARKING',
     MYPARKINGS: 'MYPARKINGS',
+    BOOKING: 'BOOKING'
 }

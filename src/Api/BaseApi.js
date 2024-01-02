@@ -1,15 +1,68 @@
 import axios from 'axios';
-const backendUrl = 'http://localhost:3000';
-
+import BaseStorage from '../LocalStorage/BaseStorage';
+const backendUrl = "http://localhost:8000/ParkingApp";
 export class BaseApi {
-    constructor(path) {
-        this.path = path;
+    constructor() {
+        this.baseStorage = new BaseStorage();
+    }
+
+    addJwtToHeaders() {
+        try {
+            const jwt = this.baseStorage.getStorage('jwt');
+            if (jwt)
+                axios.defaults.headers.common['Authorization'] = `Bearer ${jwt}`;
+            }
+        catch (error) {
+            console.error('Error while adding jwt to headers', error);
+            return error;
+        }
+    }
+
+    extractJwtFromHeaders() {
+        try {
+            const jwt = axios.defaults.headers.common['Authorization'].split(' ')[1];
+            this.baseStorage.updateStorage('jwt', jwt);
+        }
+        catch (error) {
+            console.error('Error while extracting jwt from headers', error);
+            return error;
+        }
+    }
+
+    async apiCall (method, path, id, entity) {
+        try {
+            //TODO : uncomment this after fixing the jwt issue
+            // this.addJwtToHeaders();
+            let result = null;
+            switch (method) {
+                case enumMethods.GET:
+                    result = await this.getAllApi(path, id);
+                break;
+                case enumMethods.PUT:
+                    result = await this.updateApi(path, id, entity);
+                break;
+                case enumMethods.DELETE:
+                    result = await this.deleteApi(path, id);
+                break;
+                case enumMethods.POST:
+                    result = await this.insertApi(path, entity);
+                break;
+                default:
+                    console.error('Invalid method');
+            }
+            //TODO : uncomment this after fixing the jwt issue
+            // this.extractJwtFromHeaders();
+            return result;
+        } catch (error) {
+            console.error('Error while calling api', error);
+            return error;
+        }
     }
 
     async updateApi(path, id, entity) {
         try {
             const result = await axios.put(backendUrl + path + '/' + id, entity);
-            return result.data;
+            return result;
         } catch (error) {
             console.error('Error while updating data', error);
             return error;
@@ -19,7 +72,7 @@ export class BaseApi {
     async deleteApi(path, id) {
         try {
             const result = await axios.delete(backendUrl + path + '/' + id);
-            return result.data;
+            return result;
         } catch (error) {
             console.error('Error while deleting data', error);
             return error;
@@ -29,7 +82,7 @@ export class BaseApi {
     async getAllApi(path) {
         try {
             const result = await axios.get(backendUrl + path);
-            return result.data;
+            return result;
         } catch (error) {
             console.error('Error while getting data', error);
             return error;
@@ -39,7 +92,7 @@ export class BaseApi {
     async insertApi(path, entity) {
         try {
             const result = await axios.post(backendUrl + path, entity);
-            return result.data;
+            return result;
         } catch (error) {
             console.error('Error while inserting data', error);
             return error;
@@ -47,3 +100,9 @@ export class BaseApi {
     }
 }
 
+export const enumMethods = {
+    GET: 'GET',
+    PUT: 'PUT',
+    DELETE: 'DELETE',
+    POST: 'POST'
+}

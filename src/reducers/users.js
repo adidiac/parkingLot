@@ -12,13 +12,12 @@ const removeFromLocalStorage = () => {
     localStorage.removeItem('user');
 }
 export const user = (state=userInitialState,action)=>{
-
     //verify if user is logged in
     if(state===null){
         state=takeFromLocalStorage();
     }
     if(action.type==='LOGIN'){
-        state=action.data;
+        state=action.payload;
         storeToLocalStorage(state);
         return state;
     }
