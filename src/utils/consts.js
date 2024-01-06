@@ -1,6 +1,8 @@
 import { pages, userRoles } from "../utils/enums";
 import Home from "../Pages/Home";
 import abi from './Transactions.json';
+import Parkings from "../Pages/Parkings";
+import MyBookings from "../Pages/MyBookings";
 
 function getPageBasedOnUserFromLocalStorage  ()  {
     const user = JSON.parse(localStorage.getItem('user'));
@@ -17,8 +19,8 @@ function getPageBasedOnUserFromLocalStorage  ()  {
 
 export const pagesDictionary = {
     "HOME": (options) => <Home/>,
-    "PARKING": (options) => <></>,
-    "BOOKING": (options) => <></>,
+    "PARKING": (options) => <Parkings />,
+    "BOOKING": (options) => <MyBookings />,
     "MYPARKINGS": (options) => <></>,
 }
 

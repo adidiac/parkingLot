@@ -1,19 +1,24 @@
-import {Row,Col,Modal,Button,Container,Spinner} from 'react-bootstrap';
+import {Row,Col,Modal,Button,Table,Spinner} from 'react-bootstrap';
 import { TransactionContext } from '../Transanctions/TransactionProvider';
 import { useState,useEffect } from 'react';
 import { useContext } from "react";
 import * as Icons from 'react-bootstrap-icons';
 import { shopAddress } from '../utils/consts';
 import { useSelector,useDispatch } from 'react-redux';
+import { success, error } from '../notify';
 export default function ModalCart({modalShow,setModalShow}){
-    const { currentAccount, connectWallet, handleChange, sendTransaction, formData,isLoading } = useContext(TransactionContext);
+    const { currentAccount, connectWallet, handleChange, sendTransaction, formData, isLoading } = useContext(TransactionContext);
 
-    const products=[]
+    const products= useSelector(state=> state.bookings)
+    const user = useSelector(state => state.user)
     const dispatch=useDispatch();
 
-    const buy=()=>{
-        let price=0;
-        let name='';
+    const buy=async ()=>{
+        let price= [...products].reduce((prevValue, currentValue)=>{
+            return prevValue+currentValue.price
+        },0)
+        console.log(price, user)
+        let name=user.email
 
         let formData={
             amount:price.toString(),
@@ -21,7 +26,21 @@ export default function ModalCart({modalShow,setModalShow}){
             keyword:name,
             message:name
         }
-        sendTransaction(formData);
+        try{
+            await sendTransaction(formData);
+            success("Transaction is a succes")
+            
+            setModalShow(false);
+        }
+        catch(err){
+            error("Error in transaction")
+            console.log(err);
+        }
+    }
+
+    const removeProduct = (booking) => 
+    {
+        dispatch({type:"REMOVE_BOOKING", payload: booking})
     }
 
     const modalBody=()=>{
@@ -33,36 +52,41 @@ export default function ModalCart({modalShow,setModalShow}){
             </Button>
         }
         else{
-            return <Container>
-            {
-                products?.map((product,idx)=>{
-                    return <Row key={product.id}>
-                        <Col>
-                            <img src={product.picture} style={{width:80,height:80,margin:5,border:'1px solid black',borderRadius:"50%"}}/>
-                        </Col>
-                        <Col style={{margin:10,fontSize:10}}>
-                            <h4>{product.name}</h4>
-                            <Row>
-                            <Col>
-                            <Row>
-                            <h5>{product.price}</h5>
-                            </Row>
-                            </Col>
-                            <Col>
-                            <Icons.Coin size={25}></Icons.Coin>
-                            </Col>
-                            </Row>
-                        </Col>
-                    </Row>
+            return <Table striped bordered hover>
+            <thead>
+                <tr>
+                <th>Index</th>
+                <th>Booking start date</th>
+                <th>Booking end date</th>
+                <th>Price</th>
+                <th>Remove</th>
+                </tr>
+            </thead>
+            <tbody>
+            {products.map((product,idx)=>{
+                    return <tr key={idx}>
+                        <td>{idx+1}.</td>
+                        <td>{product.booking_start_date}</td>
+                        <td>{product.booking_end_date}</td>
+                        <td>
+                            {product.price}
+                            <Icons.Coin size={24}></Icons.Coin>
+                        </td>
+                        <td>
+                            <Button onClick={()=>removeProduct(product)}>
+                                <Icons.Trash size={24}></Icons.Trash>
+                            </Button>
+                        </td>
+                    </tr>
                 }
-                )
-            }
-            </Container>
+            )}
+            </tbody>
+        </Table>
         }
     }
 
     return <>
-        <Modal show={modalShow} onHide={() => setModalShow(false)}>
+        <Modal show={modalShow} onHide={() => setModalShow(false)} size="lg">
             <Modal.Header closeButton>
             <Modal.Title>Cart</Modal.Title>
             </Modal.Header>
@@ -76,7 +100,6 @@ export default function ModalCart({modalShow,setModalShow}){
             {isLoading? <Spinner animation="border" variant="primary" />:
                         <Button onClick={()=>{
                             buy();
-                            setModalShow(false);
                         }}>Buy</Button>
                         }
             </Modal.Footer>

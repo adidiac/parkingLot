@@ -16,6 +16,7 @@ export function FloatingNavbar()
 
     const dispatch = useDispatch();
     const user = useSelector(state => state.user);
+    const bookings = useSelector(state=> state.bookings)
 
     const pageDispatch = (option) => {
         dispatch({type: option});
@@ -27,7 +28,6 @@ export function FloatingNavbar()
     }
 
     const navbarOptions = () => {
-        console.log(user);
         if (user === null) {
             return (
                 <>
@@ -53,8 +53,15 @@ export function FloatingNavbar()
                 </NavLink>
                 <Button variant="primary"
                         onClick={() => setShowModalCart(true)}
-                        style={{marginRight: "20px",fontSize: "20px"}}>
+                        style={{marginRight: "20px",fontSize: "20px", position:'relative'}}
+                        >
                             <Icons.Cart size={25}></Icons.Cart>
+                            {
+                                bookings && bookings.length>0 &&
+                                <span className="notification-badge">
+                                    {bookings.length}
+                                </span>
+                            }
                 </Button>
                 <Button variant="primary"
                         onClick={() => logoutHandler()}

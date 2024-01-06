@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import { Table, Button, Modal, Form } from 'react-bootstrap';
 import { BaseApi, enumMethods } from '../Api/BaseApi';
 
@@ -19,9 +19,12 @@ export function GenericModal({form, show, onHide, onSubmit, title, submitButtonT
             <Form onSubmit={onSubmit}>
                 {form}
                 {children}
-                <Button variant="primary" type="submit" style={{marginTop:10}}>
-                    {submitButtonText}
-                </Button>
+                {
+                    submitButtonText!=null &&
+                    <Button variant="primary" type="submit" style={{marginTop:10}}>
+                        {submitButtonText}
+                    </Button>
+                }
             </Form>
         </Modal.Body>
     </Modal>
@@ -35,6 +38,10 @@ export function GenericAddForm(
 )
 {
     const [formData, setFormData] = useState({});
+
+     //* type [callbackOnChange]
+     const callbacksOnChange = data.filter((data)=>data.callbackOnChange!=null).map((data)=>data.callbackOnChange);
+
     const handleChange = (event)=>{
         const target = event.target;
         const name = target.name;
@@ -46,6 +53,20 @@ export function GenericAddForm(
         onSubmit(formData);
         handleClose();
     }
+    
+    const getValue = useCallback((data) => {
+        if(formData[data.name]) return formData[data.name]
+        if (data.defaultValue) 
+            formData[data.name]=data.defaultValue
+        return data.defaultValue
+    },[formData])
+
+    useEffect(()=>{
+        callbacksOnChange.forEach((callback)=>{
+            callback(formData, setFormData);
+        })
+    }, [formData]);
+
     return <>
         <GenericModal
             form={data.map((data, idx)=>{
@@ -57,6 +78,7 @@ export function GenericAddForm(
                         type={data.type} 
                         placeholder={data.placeholder}
                         isInvalid={!data.validate(formData[data.name])}
+                        value={getValue(data)}
                         onChange={handleChange}/>
                     <Form.Control.Feedback type="invalid">
                         Please provide a valid state.
@@ -75,10 +97,21 @@ export function GenericAddForm(
 //* data {name,type,placeholder,label}
 */
 export const GenericUpdateForm = (
-    { data, onSubmit, title, submitButtonText, show, handleClose}
+    { 
+        data, 
+        onSubmit, 
+        title, 
+        submitButtonText, 
+        show, 
+        handleClose
+    }
     ) => {
 
     const [dataValues, setDataValues] = useState({});
+
+
+    //* type [callbackOnChange]
+    const callbacksOnChange = data.filter((data)=>data.callbackOnChange!=null).map((data)=>data.callbackOnChange);
 
     useEffect(()=>{
         let values={};
@@ -95,6 +128,12 @@ export const GenericUpdateForm = (
         setDataValues({...dataValues,[name]:value});
     }
 
+    useEffect(()=>{
+        callbacksOnChange.forEach((callback)=>{
+            callback(dataValues, setDataValues);
+        })
+    }, [dataValues]);
+
     const handleSubmit = (event)=>{
         event.preventDefault();
         onSubmit(dataValues);
@@ -103,13 +142,18 @@ export const GenericUpdateForm = (
     return <>
         <GenericModal
             form={data.map((data)=>{
-                if (data.special) return data.special.getComponent(data,handleChange);
+                if (data.special)
+                {
+                    return data.special.getComponent(data.value,handleChange);
+                }
+                else
                 return <Form.Group controlId={data.name}>
                     <Form.Label>{data.label}</Form.Label>
                     <Form.Control 
                             name={data.name} 
                             type={data.type} placeholder={data.placeholder} 
                             value={dataValues[data.name]}
+                            readOnly={data.readonly}
                             isInvalid={!data.validate(dataValues[data.name])}
                            onChange={handleChange}/>
                        <Form.Control.Feedback type="invalid">
@@ -127,7 +171,17 @@ export const GenericUpdateForm = (
     </>
 }
 export class Field {
-    constructor(key, type, placeholder, label, special = null, defaultValue = null, regex = null) {
+    constructor(
+        key,
+        type,
+        placeholder, 
+        label, 
+        special = null, 
+        defaultValue = null, 
+        regex = null,
+        readonly = false
+    ) 
+    {
         this.key = key;
         this.type = type;
         this.placeholder = placeholder;
@@ -136,6 +190,9 @@ export class Field {
         this.defaultValue = defaultValue;
         this.regex = this.constructRegex(regex);
         this.value = defaultValue;
+        this.readonly = readonly
+        // function (dataValues, setDataValues)
+        this.callbackOnChange = null;
     }
 
     getValue = () => {
@@ -144,6 +201,11 @@ export class Field {
 
     withRegex = (regex) => {
         this.regex = this.constructRegex(regex);
+        return this;
+    }
+
+    withCallbackOnChange = (callback) => {
+        this.callbackOnChange = callback;
         return this;
     }
     constructRegex = (regex) => {
@@ -169,7 +231,10 @@ export class Field {
             type: this.type,
             placeholder: this.placeholder,
             label: this.label,
-            validate: this.validate
+            validate: this.validate,
+            readonly: this.readonly,
+            special: this.special,
+            callbackOnChange: this.callbackOnChange
         }
     }
 
@@ -178,8 +243,12 @@ export class Field {
             name: this.key,
             type: this.type,
             placeholder: this.placeholder,
+            defaultValue : this.defaultValue,
             label: this.label,
-            validate: this.validate
+            validate: this.validate,
+            readonly: this.readonly,
+            special: this.special,
+            callbackOnChange: this.callbackOnChange
         }
     }
 }
@@ -204,99 +273,4 @@ export class EntityDefinition {
     setEntity = (entity) => {
         this.entity = entity;
     }
-}
-/*
-//* entityDefinition {path, keys, 
-*/
-export function GenericTabel({entityDefinition})
-{
-    const [data, setData] = useState([]);
-    const [showUpdate, setShowUpdate] = useState(false);
-    const [showAdd, setShowAdd] = useState(false);
-
-    const handleShowUpdate = () => setShowUpdate(true);
-    const handleCloseUpdate = () => setShowUpdate(false);
-    const handleShowAdd = () => setShowAdd(true);
-    const handleCloseAdd = () => setShowAdd(false);
-
-    const getData =async ()=>{
-        const data = await entityDefinition.getData();
-        setData(data);
-    }
-
-    const updateData = async (data,id)=>{
-        const result = entityDefinition.updateData(data,id);
-        getData();
-    }
-
-    const deleteData =async (id)=>{
-        const result = await entityDefinition.deleteData(id);
-        getData();
-    }
-
-    const addData = async (data)=>{
-        const result = await entityDefinition.addData(data);
-        getData();
-    }
-
-    useEffect(()=>{
-        getData();
-    },[])
-
-    return <Table striped bordered hover>
-        <thead>
-        <tr>
-          {
-            entityDefinition.getFields().map((field)=>{
-                return <th>{field.label}</th>
-            })
-          }
-        </tr>
-        </thead>
-        <tbody>
-        {data.map((entity)=>{
-                return <tr>
-                    {
-                        entityDefinition.getFields().map((field)=>{
-                            return <td>{entity[field.key]}</td>
-                        })
-                    }
-                    <td>
-                        <Button variant="primary" onClick={handleShowUpdate}>
-                            Update
-                        </Button>
-                        { 
-                            showUpdate && 
-                            <GenericUpdateForm
-                                data = { entityDefinition.getFields().map((field)=>{
-                                    return field.createUpdateData(entity[field.key]);
-                                })}
-                                onSubmit = {(data)=>updateData(data, entity.id)}
-                                title = {"Update "+ entityDefinition.getEntityName()}
-                                submitButtonText = "Update"
-                                show = {showUpdate}
-                                handleClose = {handleCloseUpdate}
-                            />
-                        }   
-                        <Button variant="danger" onClick={()=>deleteData(entity.id)}>Delete</Button>
-                    </td>
-                </tr>
-            }
-        )}
-        </tbody>
-        <Button variant="primary" onClick={handleShowAdd}>
-            Add
-        </Button>
-        <GenericAddForm
-            data={ entityDefinition.getFields().map((field)=>{
-                return field.createAddData();
-            })}
-            onSubmit={(data)=>addData(data)}
-            title={"Add "+entityDefinition.getEntityName()}
-            submitButtonText="Add"
-            show={showAdd}
-            handleClose={handleCloseAdd}
-        />
-    </Table>
-
 }

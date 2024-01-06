@@ -42,6 +42,30 @@ export class CompleteApi extends BaseApi {
     getAllUsers = async () => {
         return await this.apiCall(enumMethods.GET, this.user, null, null);
     }
+
+    getAllParkingSlotsAvailable = async () => {
+        return await  this.apiCall(enumMethods.GET, this.parkingSlotsAvailable, null, null);
+    }
+
+    getAllParkingSlots = async () =>{
+        return await this.apiCall(enumMethods.GET, this.parkingSlots, null, null);
+    }
+
+    getParkingSlot = async (id) => {
+        return await this.apiCall(enumMethods.GET, this.parkingSlots, id, null);
+    }
+
+    getParkDetails = async (id) => {
+        return await this.apiCall(enumMethods.GET,this.parkDetails, id, null);
+    }
+
+    getAllBookings = async () => {
+        return await this.apiCall(enumMethods.GET, this.bookings, null, null);
+    }
+
+    createBooking = async (data) => {
+        return await this.apiCall(enumMethods.POST, this.bookings, null, data);
+    }
 }
 
 export const completeApiObj = new CompleteApi();
