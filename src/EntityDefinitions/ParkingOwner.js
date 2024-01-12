@@ -39,5 +39,5 @@ export const useRegisterParkingOwnerHook = () =>
         }
     }
 
-    return [registerParkOnwerEntity, registerParkingOwner];
+    return {registerParkOnwerEntity, registerParkingOwner};
 } 

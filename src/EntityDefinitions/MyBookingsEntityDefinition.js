@@ -13,11 +13,12 @@ class MyBookingsEntityDefinition extends EntityDefinition
 }
 
 const myBookingsFields = [
-    new Field("booking_start_date","date","", "Floor", "", "").withRegex(),
-    new Field("booking_end_date","date","","Slot number", "", "").withRegex(),
-    new Field("price","checkbox","","Has charger", "", "").withRegex(),
+    new Field("booking_start_date","date","", "Booking start date", "", "").withRegex(),
+    new Field("booking_end_date","date","","Booking end date", "", "").withRegex(),
+    new Field("price","number","","Price", "", "").withRegex(),
     new Field("info","","", "More info", "", "").withRegex(),
 ]
+
 
 export const useMyBookingsHook=()=>
 {
@@ -38,6 +39,8 @@ export const useMyBookingsHook=()=>
             return myBookings.map(myBooking => {
                 return  {
                     ...myBooking,
+                    booking_start_date: new Date(myBooking.booking_start_date).toUTCString(),
+                    booking_end_date: new Date(myBooking.booking_end_date).toUTCString(),
                     info: <BookingDetail id={myBooking.parking_slot} />
                 }    
             })
@@ -48,5 +51,17 @@ export const useMyBookingsHook=()=>
         }
     }
 
-    return [myBookingsEntity, getData]
+    const createBooking = async (data) => {
+        console.log(data)
+        const result = await completeApiObj.createBooking(data);
+        if(result.status < 400)
+        {
+            success("Succesfully create booking", true)
+        }
+        else{
+            error("Problem in create booking", true);
+        }
+    }
+
+    return {myBookingsEntity, getData, createBooking}
 }

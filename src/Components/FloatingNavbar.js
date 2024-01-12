@@ -12,7 +12,7 @@ export function FloatingNavbar()
     const [show, setShow] = useState(false);
     const [showModalCart,setShowModalCart]=useState(false);
 
-    const [loginEntityDefinition, loginUser] = useLoginUser();
+    const {loginEntityDefinition, loginUser} = useLoginUser();
 
     const dispatch = useDispatch();
     const user = useSelector(state => state.user);

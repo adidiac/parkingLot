@@ -17,13 +17,22 @@ class ParkingsEntityDefinition extends EntityDefinition
 }
 //TODO: add regex
 const parkingsFields = [
-    new Field("floor","number","", "Floor", "", "").withRegex(),
-    new Field("slot_number","number","","Slot number", "", "").withRegex(),
-    new Field("has_charger","checkbox","","Has charger", "", "").withRegex(),
-    new Field("physical_available","checkbox","","Physical available", "", "").withRegex(),
-    new Field("standard_price","checkbox","", "Standard price", "", "").withRegex(),
+    new Field("floor","number","", "Floor", "",null, null, true).withRegex(),
+    new Field("slot_number","number","","Slot number", "",null, null, true).withRegex(),
+    new Field("has_charger","text","","Has charger", "", null, null, true).withRegex(),
+    new Field("physical_available","text","","Physical available", "", null, null, true).withRegex(),
+    new Field("standard_price","number","", "Standard price", "", null, null, true).withRegex(),
     new Field("info","","", "More info", "", "").withRegex(),
     new Field("add","","", "Add booking", "", "").withRegex(),
+]
+
+const parkingFieldsAdmin = [
+        new Field("parking_slot_id","hidden","", "Parking slot id", "",null, null,null).withRegex(),
+        new Field("floor","number","", "Floor", "",null, null, null).withRegex(),
+        new Field("slot_number","number","","Slot number", "",null, null, null).withRegex(),
+        new Field("has_charger","checkbox","","Has charger", "", null, null, null).withRegex(),
+        new Field("physical_available","checkbox","","Physical available", "", null, null, null).withRegex(),
+        new Field("standard_price","number","", "Standard price", "", null, null, null).withRegex(),
 ]
 export const useParkingSlotsHook = () =>{
 
@@ -35,7 +44,11 @@ export const useParkingSlotsHook = () =>{
         return new ParkingsEntityDefinition(parkingsFields.slice(0,4), "Parking")
     })
 
-    const getData =  async () => {
+    const parkingSlotEntityAdministration = useMemo(()=>{
+        return new ParkingsEntityDefinition(parkingFieldsAdmin, "Parking Administration")
+    },[])
+
+    const getData =  async ( update = false) => {
         const result = await completeApiObj.getAllParkingSlots()
         if(result.status < 400)
         {
@@ -45,8 +58,17 @@ export const useParkingSlotsHook = () =>{
                 return {
                     ...parkingSlot,
                     id:parkingSlot.parking_slot_id,
-                    has_charger: booleanToString(parkingSlot.has_charger),
-                    physical_available: booleanToString(parkingSlot.physical_available),
+                    has_charger: update ? parkingSlot.has_charger :
+                    booleanToString(parkingSlot.has_charger),
+                    physical_available: update ? parkingSlot.physical_available :
+                    booleanToString(parkingSlot.physical_available),
+                    toString: (parkingSlot) => {
+                        return `Floor: ${parkingSlot.floor} \n 
+                        Slot number: ${parkingSlot.slot_number} \n
+                        Has charger: ${parkingSlot.has_charger} \n
+                        Physical available: ${parkingSlot.physical_available} \n
+                        Standard price: ${parkingSlot.standard_price}`
+                    },
                     info: <ParkingSlotDetails id = {parkingSlot.parking_slot_id} />,
                     add: <AddBooking id = {parkingSlot.parking_slot_id} price = {parkingSlot.standard_price} />
                 }
@@ -58,17 +80,18 @@ export const useParkingSlotsHook = () =>{
         }
     }
 
-    const getDataById = async (id) => {
+    const getDataById = async (id, isUpdate = false) => {
         const result = await completeApiObj.getParkingSlot(id)
         if(result.status < 400)
         {
             const parkingSlot = result.data
-            success("Succesfully retrieve parking slot", true)
             return {
                 ...parkingSlot,
-                id:parkingSlot.parking_slot_id,
-                has_charger: booleanToString(parkingSlot.has_charger),
-                physical_available: booleanToString(parkingSlot.physical_available)
+                parking_slot_id:parkingSlot.parking_slot_id,
+                has_charger: isUpdate ? parkingSlot.has_charger :
+                booleanToString(parkingSlot.has_charger),
+                physical_available: isUpdate ? parkingSlot.physical_available :
+                booleanToString(parkingSlot.physical_available),
             }
         }
         else{
@@ -77,5 +100,16 @@ export const useParkingSlotsHook = () =>{
         }
     }
 
-    return [parkingSlotsEntity, getData, parkingSlotEntityById, getDataById]
+    const updateData = async (data) => {
+        const result = await completeApiObj.updateParkingSlot(data)
+        if(result.status < 400)
+        {
+            success("Succesfully update parking slot", true)
+        }
+        else{
+            error("Problem in update parking slot", true);
+        }
+    }
+
+    return {parkingSlotsEntity, getData, parkingSlotEntityById, getDataById, parkingSlotEntityAdministration, updateData}
 }

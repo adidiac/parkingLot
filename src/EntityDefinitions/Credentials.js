@@ -11,7 +11,7 @@ class CredentialsEntityDefiniton extends EntityDefinition {
 }
 
 const loginUsersFields = [
-    new Field("email", "email", "Enter Email", "Email").withRegex(/^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[A-Za-z]+$/),
+    new Field("email", "email", "Enter Email", "Email").withRegex(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/),
     new Field("password", "password", "Enter Password", "Password").withRegex(/^[a-zA-Z0-9]+$/),
 ];
 
@@ -54,7 +54,6 @@ export const useLoginUser = () => {
                 success("Login successful",true);
             }
             else if (parkOwner) {
-                console.log({...user, role: userRoles.USER});
                 dispatch({type: 'LOGIN', payload: {...parkOwner, role: userRoles.PARKOWNER}});
                 dispatch({type: pages.MYPARKINGS});
                 success("Login successful",true);
@@ -70,6 +69,6 @@ export const useLoginUser = () => {
         }
     }
 
-    return [loginEntityDefinition, loginUser];
+    return {loginEntityDefinition, loginUser};
 
 }

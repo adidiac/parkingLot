@@ -52,7 +52,7 @@ export const useAddParkingSlotBookingEntityDefinitionHook = (
                 }
             })
         ];
-        return new AddParkingSlotBookingEntityDefinition(addParkingSlotBookingFields, "AddParkingSlotBooking");
+        return new AddParkingSlotBookingEntityDefinition(addParkingSlotBookingFields, "Add Parking Slot Booking");
     });
 
     const createNewBooking = (booking) => {
@@ -67,5 +67,5 @@ export const useAddParkingSlotBookingEntityDefinitionHook = (
         dispatch({type:"ADD_BOOKING", payload: newBooking})
     }
 
-    return [addParkingSlotBookingEntityDefinition, createNewBooking];
+    return {addParkingSlotBookingEntityDefinition, createNewBooking};
 }

@@ -2,10 +2,10 @@ import { GenericTabel } from "../GenericComponents/GenericTable"
 import { useMyBookingsHook } from "../EntityDefinitions/MyBookingsEntityDefinition"
 export default function Parkings({}) {
 
-    const [
+    const {
         myBookingsEntity,
         getData
-    ] = useMyBookingsHook()
+     } = useMyBookingsHook()
     return <div className="center-div">
         <GenericTabel 
         getDataMethod={getData}

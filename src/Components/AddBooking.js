@@ -5,10 +5,10 @@ import { useAddParkingSlotBookingEntityDefinitionHook } from '../EntityDefinitio
 
 export default function AddBooking({id, price})
 {
-    const [
+    const {
     addParkingSlotBookingEntityDefinition, 
     createNewBooking
-    ] = useAddParkingSlotBookingEntityDefinitionHook({id,price});
+     } = useAddParkingSlotBookingEntityDefinitionHook({id,price});
     
     const [showUpdate, setShowUpdate] = useState();
 

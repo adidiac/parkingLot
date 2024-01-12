@@ -32,8 +32,7 @@ export const useParkingSlotDetailsHook = (id) => {
         return new ParkingSlotDetailsEntityDefinition(parkingSlotDetailsFields,"Parking slot details")
     });
     const getDetails = async () => {
-        const result = await completeApiObj.getParkDetails(id);
-        console.log(result)
+        const result = await completeApiObj.getParkDetails('1');
         if(result.status < 400)
         {
             const data = {
@@ -48,5 +47,5 @@ export const useParkingSlotDetailsHook = (id) => {
         }
     }
 
-    return [parkingSlotDetailsEntity, getDetails]
+    return {parkingSlotDetailsEntity, getDetails}
 }

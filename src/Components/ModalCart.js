@@ -6,35 +6,47 @@ import * as Icons from 'react-bootstrap-icons';
 import { shopAddress } from '../utils/consts';
 import { useSelector,useDispatch } from 'react-redux';
 import { success, error } from '../notify';
+import { useMyBookingsHook } from '../EntityDefinitions/MyBookingsEntityDefinition';
 export default function ModalCart({modalShow,setModalShow}){
     const { currentAccount, connectWallet, handleChange, sendTransaction, formData, isLoading } = useContext(TransactionContext);
 
     const products= useSelector(state=> state.bookings)
+    console.log(products)
     const user = useSelector(state => state.user)
     const dispatch=useDispatch();
+
+    const {
+        createBooking
+    } = useMyBookingsHook()
 
     const buy=async ()=>{
         let price= [...products].reduce((prevValue, currentValue)=>{
             return prevValue+currentValue.price
         },0)
-        console.log(price, user)
-        let name=user.email
-
+        let name=user.first_name + " " + user.last_name
+        let finalPrice = price/ 100000
         let formData={
-            amount:price.toString(),
+            amount:finalPrice.toString(),
             addressTo:shopAddress,
             keyword:name,
             message:name
         }
         try{
             await sendTransaction(formData);
+            products.forEach(async (product)=>{
+                await createBooking({
+                    booking_start_date: new Date(product.booking_start_date).toISOString(),
+                    booking_end_date: new Date(product.booking_end_date).toISOString(),
+                    parking_slot: product.parking_slot,
+                    user: user.user_id
+                })
+            })
             success("Transaction is a succes")
-            
+            dispatch({type:"REMOVE_ALL_BOOKINGS"})
             setModalShow(false);
         }
         catch(err){
             error("Error in transaction")
-            console.log(err);
         }
     }
 

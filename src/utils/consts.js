@@ -3,10 +3,12 @@ import Home from "../Pages/Home";
 import abi from './Transactions.json';
 import Parkings from "../Pages/Parkings";
 import MyBookings from "../Pages/MyBookings";
+import MyParkings from "../Components/MyParkings";
 
 function getPageBasedOnUserFromLocalStorage  ()  {
     const user = JSON.parse(localStorage.getItem('user'));
     if (user) {
+        console.log(user);
         if (user.role === userRoles.NORMAL) {
             return pages.PARKING;
         }
@@ -21,7 +23,7 @@ export const pagesDictionary = {
     "HOME": (options) => <Home/>,
     "PARKING": (options) => <Parkings />,
     "BOOKING": (options) => <MyBookings />,
-    "MYPARKINGS": (options) => <></>,
+    "MYPARKINGS": (options) => <MyParkings />,
 }
 
 export const initialStatePage = pagesDictionary[getPageBasedOnUserFromLocalStorage()]();

@@ -71,6 +71,16 @@ export function GenericAddForm(
         <GenericModal
             form={data.map((data, idx)=>{
                 if (data.special) return data.special.getComponent(data,handleChange);
+                if(data.type === 'checkbox')
+                {
+                    return <Form.Check // prettier-ignore
+                    type="switch"
+                    id="idx"
+                    label={data.label}
+                    name={data.name}
+                    value={getValue(data)}
+                  />
+                }
                 return <Form.Group controlId={data.name} key={idx}>
                     <Form.Label>{data.label}</Form.Label>
                     <Form.Control 
@@ -121,10 +131,14 @@ export const GenericUpdateForm = (
         setDataValues(values);
     },[data]);
     
+    const verifyIsCheckBox = (name) => {
+        return data.filter((data)=>data.name===name)[0].type === 'checkbox'
+    }
+
     const handleChange = (event)=>{
         const target = event.target;
         const name = target.name;
-        const value = target.value;
+        const value = verifyIsCheckBox(name) ? target.checked : target.value;
         setDataValues({...dataValues,[name]:value});
     }
 
@@ -146,12 +160,26 @@ export const GenericUpdateForm = (
                 {
                     return data.special.getComponent(data.value,handleChange);
                 }
-                else
+                if(data.type === 'checkbox')
+                {
+                    return <Form.Check // prettier-ignore
+                    type="switch"
+                    id="idx"
+                    label={data.label}
+                    name={data.name}
+                    style={{margin:10}}
+                    checked={dataValues[data.name]}
+                    onChange={handleChange}
+                  />
+                }
                 return <Form.Group controlId={data.name}>
+                    { data.type === 'hidden' ? null :
                     <Form.Label>{data.label}</Form.Label>
+                    }
                     <Form.Control 
                             name={data.name} 
-                            type={data.type} placeholder={data.placeholder} 
+                            type={data.type} 
+                            placeholder={data.placeholder} 
                             value={dataValues[data.name]}
                             readOnly={data.readonly}
                             isInvalid={!data.validate(dataValues[data.name])}

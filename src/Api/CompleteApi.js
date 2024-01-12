@@ -66,6 +66,13 @@ export class CompleteApi extends BaseApi {
     createBooking = async (data) => {
         return await this.apiCall(enumMethods.POST, this.bookings, null, data);
     }
+
+    updateParkingSlot = async (data) => {
+        return await this.apiCall(enumMethods.PUT, this.parkingSlots, data.parking_slot_id, data);
+    }
+    createBooking = async (data) => {
+        return await this.apiCall(enumMethods.POST, this.bookings, null, data);
+    }
 }
 
 export const completeApiObj = new CompleteApi();

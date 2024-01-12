@@ -34,7 +34,6 @@ export const useRegisterNormalUserHook = () =>
 
         if(responseCredentials.status < 400){
             const dataCredentials = responseCredentials.data; // {credentials_id, email, password}
-            console.log(dataCredentials)
             const entityUser = {
                 credentials: dataCredentials.credentials_id,
                 first_name: entity.first_name,
@@ -65,5 +64,5 @@ export const useRegisterNormalUserHook = () =>
 
     }
 
-    return [registerNormalUserEntity, registerNormalUser]
+    return {registerNormalUserEntity, registerNormalUser}
 }

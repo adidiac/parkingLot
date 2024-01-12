@@ -36,15 +36,15 @@ export default function Home() {
   const [showNormalUser, setShowNormalUser] = useState(false);
   const [showParkOwnerUser, setShowParkOwnerUser] = useState(false);
 
-  const [
+  const {
     registerParkOnwerEntity,
     registerParkingOwner
-  ] = useRegisterParkingOwnerHook();
+  } = useRegisterParkingOwnerHook();
 
-  const  [
+  const  {
     registerNormalUserEntity,
     registerNormalUser
-  ] = useRegisterNormalUserHook();
+   } = useRegisterNormalUserHook();
 
     return (
         <div className="demo image above">

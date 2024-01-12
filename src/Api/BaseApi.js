@@ -60,7 +60,7 @@ export class BaseApi {
 
     async updateApi(path, id, entity) {
         try {
-            const result = await axios.put(backendUrl + path + '/' + id, entity);
+            const result = await axios.put(backendUrl + path + id + '/', entity);
             return result;
         } catch (error) {
             return {status: 500};
@@ -69,7 +69,7 @@ export class BaseApi {
 
     async deleteApi(path, id) {
         try {
-            const result = await axios.delete(backendUrl + path + '/' + id);
+            const result = await axios.delete(backendUrl + path + id + '/');
             return result;
         } catch (error) {
             return {status: 500};

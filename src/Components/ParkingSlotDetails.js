@@ -2,12 +2,12 @@ import { useParkingSlotDetailsHook } from "../EntityDefinitions/ParkSlotDetails"
 import { GenericUpdateForm } from "../GenericComponents/GenericComponents"
 import { Table, Button, Modal, Form } from 'react-bootstrap';
 import { useEffect, useState } from "react";
-export default function ParkingSlotDetails({id})
+export default function ParkingSlotDetails({id, isUpdate})
 {
-    const [
+    const {
         parkingSlotDetailsEntity,
         getDetails
-    ] = useParkingSlotDetailsHook(id);
+     } = useParkingSlotDetailsHook(id);
 
     const [showUpdate, setShowUpdate] = useState();
 
@@ -26,9 +26,12 @@ export default function ParkingSlotDetails({id})
     },[])
 
     return <>
-        <Button variant="primary" onClick={handleShowUpdate}>
-            {element ? 'Info' : 'No info'}
-        </Button>
+        {   element
+            ? <Button variant="primary" onClick={handleShowUpdate}>
+                Info
+              </Button>
+            : 'No info'
+        }
         { 
             showUpdate && element && 
             <GenericUpdateForm

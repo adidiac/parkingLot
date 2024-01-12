@@ -1,13 +1,9 @@
-import { useParkingSlotsHook } from '../EntityDefinitions/Parkings';
-import { GenericUpdateForm } from "../GenericComponents/GenericComponents"
-import { Table, Button, Modal, Form } from 'react-bootstrap';
-import { useEffect, useState } from "react";
-export default function BookingDetail({id})
+export default function ParkingSlotDetailsUpdate({id, isUpdate})
 {
     const {
-        parkingSlotEntityById,
-        getDataById
-     } = useParkingSlotsHook();
+        parkingSlotDetailsEntity,
+        getDetails
+     } = useParkingSlotDetailsHook(id);
 
     const [showUpdate, setShowUpdate] = useState();
 
@@ -17,7 +13,7 @@ export default function BookingDetail({id})
     const handleShowUpdate = () => setShowUpdate(true);
 
     const setData = async () =>{
-        const element = await getDataById(id);
+        const element = await getDetails();
         if(element) setElement(element);
     }
 
@@ -26,17 +22,20 @@ export default function BookingDetail({id})
     },[])
 
     return <>
-        <Button variant="primary" onClick={handleShowUpdate}>
-            Info
-        </Button>
+        {   element
+            ? <Button variant="primary" onClick={handleShowUpdate}>
+                Update Parking Details
+              </Button>
+            : 'No info'
+        }
         { 
             showUpdate && element && 
             <GenericUpdateForm
-                data = { parkingSlotEntityById.getFields().map((field)=>{
+                data = { parkingSlotDetailsEntity.getFields().map((field)=>{
                     return field.createUpdateData(element[field.key]);
                 })}
                 onSubmit = {()=>{}}
-                title = {parkingSlotEntityById.getEntityName()}
+                title = {parkingSlotDetailsEntity.getEntityName()}
                 submitButtonText = {null}
                 show = {showUpdate}
                 handleClose = {handleCloseUpdate}
