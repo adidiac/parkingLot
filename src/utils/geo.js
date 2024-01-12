@@ -1,8 +1,16 @@
-import axios from 'axios'
+
 export const getCoordinates = async (locationName)=>{
-    let result=await axios.get(`https://api.geoapify.com/v1/geocode/search?text=${locationName}&apiKey=b5b8555521e541e89c40f77cc9fb9ae2`);
-    let lat=result.data.features[0].properties.lat;
-    let lon=result.data.features[0].properties.lon;
+    const url = `https://api.geoapify.com/v1/geocode/search?text=${locationName}&apiKey=b5b8555521e541e89c40f77cc9fb9ae2`;
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    });
+    const result = await response.json();
+    const lat=result.data?.features[0].properties.lat ?? 0;
+    const lon=result.data?.features[0].properties.lon ?? 0;
+
     return {lat,lon};
 }
 export const getMap=(lon,lat)=>{
