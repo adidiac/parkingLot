@@ -10,8 +10,7 @@ import { useMyBookingsHook } from '../EntityDefinitions/MyBookingsEntityDefiniti
 export default function ModalCart({modalShow,setModalShow}){
     const { currentAccount, connectWallet, handleChange, sendTransaction, formData, isLoading } = useContext(TransactionContext);
 
-    const products= useSelector(state=> state.bookings)
-    console.log(products)
+    const products = useSelector(state=> state.bookings)
     const user = useSelector(state => state.user)
     const dispatch=useDispatch();
 

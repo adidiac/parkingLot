@@ -2,6 +2,7 @@ import { Field, EntityDefinition } from "../GenericComponents/GenericComponents"
 import {completeApiObj} from "../Api/CompleteApi";
 import { useMemo } from "react";
 import {useDispatch, useSelector} from 'react-redux';
+import {Button} from 'react-bootstrap'
 import { success,error } from "../notify";
 import BookingDetail from "../Components/BookingDetail";
 class MyBookingsEntityDefinition extends EntityDefinition
@@ -34,14 +35,15 @@ export const useMyBookingsHook=()=>
         {
             const data = result.data
             const myBookings = data.filter(booking => booking.user === user.user_id);
-            
+            console.log(myBookings)
             success("Succesfully retrieve my bookings", true)
             return myBookings.map(myBooking => {
                 return  {
                     ...myBooking,
                     booking_start_date: new Date(myBooking.booking_start_date).toUTCString(),
                     booking_end_date: new Date(myBooking.booking_end_date).toUTCString(),
-                    info: <BookingDetail id={myBooking.parking_slot} />
+                    info: <BookingDetail id={myBooking.parking_slot} />,
+                    id: myBooking.booking_id,
                 }    
             })
         }
@@ -63,5 +65,16 @@ export const useMyBookingsHook=()=>
         }
     }
 
-    return {myBookingsEntity, getData, createBooking}
+    const deleteBooking = async (id) => {
+        const result = await completeApiObj.deleteBooking(id);
+        if(result.status < 400)
+        {
+            success("Succesfully delete booking", true)
+        }
+        else{
+            error("Problem in delete booking", true);
+        }
+    }
+
+    return {myBookingsEntity, getData, createBooking, deleteBooking}
 }

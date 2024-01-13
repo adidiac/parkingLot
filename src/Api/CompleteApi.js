@@ -73,6 +73,9 @@ export class CompleteApi extends BaseApi {
     createBooking = async (data) => {
         return await this.apiCall(enumMethods.POST, this.bookings, null, data);
     }
+    deleteBooking = async (id) => {
+        return await this.apiCall(enumMethods.DELETE, this.bookings, id, null);
+    }
 }
 
 export const completeApiObj = new CompleteApi();

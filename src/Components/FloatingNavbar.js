@@ -99,7 +99,7 @@ export function FloatingNavbar()
                     className="d-inline-block align-top"
                     style={{marginLeft: "100"}}
                 />
-                <h1 style={{display: "inline-block", margin:15}}>ParkMe</h1>
+                <h1 style={{display: "inline-block", margin:15}}>SmartParking</h1>
             </Navbar.Brand>
             <Navbar.Collapse className="justify-content-end">
                 {navbarOptions()}

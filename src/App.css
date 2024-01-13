@@ -5,6 +5,7 @@
     width: 100%;
     top: 0;
     clip-path: polygon(0 0, 60% 0, 40% 100%, 0 100%);
+    transition: clip-path 0.5s ease-in-out;
   }
   .left:hover{
 
@@ -19,7 +20,7 @@
     width: 100%;
     left: 0;
     top: 0;
-   
+    transition: clip-path 0.5s ease-in-out;
     clip-path: polygon(60% 0, 100% 0%, 100% 100%, 40% 100%);
   }
   .right:hover{

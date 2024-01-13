@@ -20,7 +20,7 @@ export function GenericTabel({
     const handleShowAdd = () => setShowAdd(true);
     const handleCloseAdd = () => setShowAdd(false);
 
-    const getData =async ()=>{
+    const getData = async ()=>{
         if (!getDataMethod) return;
         const data = await getDataMethod();
         setData(data);
@@ -28,13 +28,13 @@ export function GenericTabel({
 
     const updateData = async (data,id)=>{
         if (!updateDataMethod) return
-        const result = await updateDataMethod(data,id);
+        await updateDataMethod(data,id);
         getData();
     }
 
-    const deleteData =async (id)=>{
+    const deleteData = async (id)=>{
         if (!deleteDataMethod) return
-        const result = await deleteDataMethod(id);
+        await deleteDataMethod(id);
         getData();
     }
 
